@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Alan's Farkle Score">
+    <meta name="apple-mobile-web-app-title" content="Alan's Farkle">
     <meta name="theme-color" content="#667eea">
     <title>Alan's Farkle Score</title>
     
-    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237c3aed' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white'>🎲</text></svg>">
     
     <style>
@@ -307,14 +306,22 @@
             font-size: 32px;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 8px;
+        .game-code-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-align: center;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
         }
 
-        .btn-small {
-            padding: 10px 16px;
-            font-size: 14px;
+        .spectator-banner {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            text-align: center;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
@@ -346,17 +353,17 @@
                     Start Game
                 </button>
 
-                <div style="text-align: center; margin: 20px 0; color: #6b7280; font-weight: 600;">
+                <div style="text-align: center; margin: 20px 0; color: white; font-weight: 600;">
                     OR
                 </div>
 
                 <div class="input-group">
-                    <label>Join Existing Game as Spectator</label>
+                    <label style="color: white;">Join Existing Game as Spectator</label>
                     <div class="input-row">
                         <input type="text" id="joinCodeInput" placeholder="Enter 6-digit code" maxlength="6" style="text-transform: uppercase;">
                         <button class="btn btn-secondary" onclick="joinGame()">Join</button>
                     </div>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 8px;">
                         Enter the game code from the host to watch live scoring
                     </p>
                 </div>
@@ -372,7 +379,7 @@
                         Alan's Farkle Score
                     </h1>
                     <div class="round-info">
-                        Round <span id="roundNumber">1</span> • Target: 10,000 points
+                        Target: 10,000 points
                     </div>
                 </div>
 
@@ -381,7 +388,7 @@
                 </button>
             </div>
 
-            <div id="gameCodeBanner" class="card hidden" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-align: center;">
+            <div id="gameCodeBanner" class="game-code-banner hidden">
                 <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">SHARE THIS CODE WITH FRIENDS</div>
                 <div id="gameCodeDisplay" style="font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: monospace; margin-bottom: 12px;"></div>
                 <button onclick="copyGameCode()" class="btn" style="background: rgba(255,255,255,0.2); color: white; display: inline-flex; padding: 10px 20px;">
@@ -390,9 +397,9 @@
                 <div style="font-size: 12px; margin-top: 12px; opacity: 0.9;">They can watch live scoring by entering this code</div>
             </div>
 
-            <div id="spectatorBanner" class="card hidden" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; text-align: center;">
+            <div id="spectatorBanner" class="spectator-banner hidden">
                 <div style="font-size: 16px; font-weight: 600;">👀 SPECTATOR MODE</div>
-                <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">Watching live • Updates every 2 seconds</div>
+                <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">Watching live • Updates in real-time</div>
             </div>
 
             <div id="winnerBanner" class="winner-banner hidden">
@@ -404,17 +411,69 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDuNR6xFN3JVMsRIlsnbQXeOTyfygqJIpw",
+  authDomain: "farkle-scorekeeper-3a9cb.firebaseapp.com",
+  databaseURL: "https://farkle-scorekeeper-3a9cb-default-rtdb.firebaseio.com",
+  projectId: "farkle-scorekeeper-3a9cb",
+  storageBucket: "farkle-scorekeeper-3a9cb.firebasestorage.app",
+  messagingSenderId: "827831534313",
+  appId: "1:827831534313:web:1ad81fe4cb524a5457e678"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+        // Get this from Firebase Console → Project Settings → Your apps → Web app
+        const firebaseConfig = {
+            apiKey: "YOUR-API-KEY-HERE",
+            authDomain: "YOUR-PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR-PROJECT-ID",
+            storageBucket: "YOUR-PROJECT.appspot.com",
+            messagingSenderId: "YOUR-SENDER-ID",
+            appId: "YOUR-APP-ID"
+        };
+
+        // Initialize Firebase
+        let app, database;
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            alert('Please add your Firebase configuration to enable spectator mode.');
+        }
+
+        // Make database available globally
+        window.firebaseDB = database;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseOnValue = onValue;
+        window.firebaseRemove = remove;
+    </script>
+
     <script>
         let players = [];
-        let currentRound = 1;
         let winner = null;
-        const WINNING_SCORE = 10000;
         let gameCode = null;
         let isHost = false;
         let isSpectator = false;
-        let spectatorInterval = null;
+        let gameListener = null;
+        const WINNING_SCORE = 10000;
 
-        // Generate a random 6-character game code
+        // Generate random game code
         function generateGameCode() {
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let code = '';
@@ -424,64 +483,47 @@
             return code;
         }
 
-        // Save game state to storage
+        // Save game state to Firebase
         async function saveGameState() {
-            if (!isHost || !gameCode) return;
+            if (!isHost || !gameCode || !window.firebaseDB) return;
             
             const gameState = {
                 players: players,
-                currentRound: currentRound,
                 winner: winner,
                 lastUpdated: Date.now()
             };
             
             try {
-                if (window.storage) {
-                    await window.storage.set(`farkle-game-${gameCode}`, JSON.stringify(gameState), true);
-                }
+                const gameRef = window.firebaseRef(window.firebaseDB, `games/${gameCode}`);
+                await window.firebaseSet(gameRef, gameState);
             } catch (err) {
                 console.error('Failed to save game state:', err);
-                // Continue without storage - local-only mode
             }
         }
 
-        // Load game state from storage
-        async function loadGameState(code) {
-            try {
-                if (window.storage) {
-                    const result = await window.storage.get(`farkle-game-${code}`, true);
-                    if (result && result.value) {
-                        const gameState = JSON.parse(result.value);
-                        players = gameState.players;
-                        currentRound = gameState.currentRound;
-                        winner = gameState.winner;
-                        return true;
-                    }
-                }
-            } catch (err) {
-                console.error('Failed to load game state:', err);
-            }
-            return false;
-        }
-
-        // Start spectator mode - poll for updates
-        function startSpectatorMode() {
-            spectatorInterval = setInterval(async () => {
-                const success = await loadGameState(gameCode);
-                if (success) {
+        // Listen to game state changes (for spectators)
+        function startListening(code) {
+            if (!window.firebaseDB) return;
+            
+            const gameRef = window.firebaseRef(window.firebaseDB, `games/${code}`);
+            gameListener = window.firebaseOnValue(gameRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    players = data.players || [];
+                    winner = data.winner || null;
                     renderGamePlayers();
                     if (winner) {
                         showWinner();
                     }
                 }
-            }, 2000); // Poll every 2 seconds
+            });
         }
 
-        // Stop spectator mode
-        function stopSpectatorMode() {
-            if (spectatorInterval) {
-                clearInterval(spectatorInterval);
-                spectatorInterval = null;
+        // Stop listening
+        function stopListening() {
+            if (gameListener) {
+                gameListener();
+                gameListener = null;
             }
         }
 
@@ -539,24 +581,13 @@
                 gameCode = generateGameCode();
                 document.getElementById('setupScreen').classList.add('hidden');
                 document.getElementById('gameScreen').classList.remove('hidden');
-                
-                // Check if storage is available
-                if (!window.storage) {
-                    console.warn('Storage not available - spectator mode will not work');
-                    // Still show the game code but add a note
-                    showGameCode();
-                    const banner = document.getElementById('gameCodeBanner');
-                    banner.innerHTML += '<div style="font-size: 11px; margin-top: 8px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">⚠️ Spectator mode requires hosting online</div>';
-                } else {
-                    await saveGameState();
-                    showGameCode();
-                }
-                
+                await saveGameState();
                 renderGamePlayers();
+                showGameCode();
             }
         }
 
-        // Show game code to host
+        // Show game code
         function showGameCode() {
             const banner = document.getElementById('gameCodeBanner');
             const codeDisplay = document.getElementById('gameCodeDisplay');
@@ -564,13 +595,12 @@
             banner.classList.remove('hidden');
         }
 
-        // Copy game code to clipboard
+        // Copy game code
         async function copyGameCode() {
             try {
                 await navigator.clipboard.writeText(gameCode);
                 alert('Game code copied! Share it with your friends.');
             } catch (err) {
-                // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = gameCode;
                 document.body.appendChild(textArea);
@@ -591,33 +621,26 @@
                 return;
             }
             
-            if (!window.storage) {
-                alert('Spectator mode is only available when the app is hosted online. Please use the app locally for single-device scoring.');
+            if (!window.firebaseDB) {
+                alert('Firebase not configured. Please check console for setup instructions.');
                 return;
             }
             
-            const success = await loadGameState(code);
-            if (success) {
-                gameCode = code;
-                isSpectator = true;
-                document.getElementById('setupScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                renderGamePlayers();
-                startSpectatorMode();
-                document.getElementById('spectatorBanner').classList.remove('hidden');
-            } else {
-                alert('Game not found. Please check the code and try again.');
-            }
+            gameCode = code;
+            isSpectator = true;
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('spectatorBanner').classList.remove('hidden');
+            startListening(code);
         }
 
         // Add score
         async function addScore(playerId) {
-            if (isSpectator) return; // Spectators can't add scores
+            if (isSpectator) return;
             
             const input = document.getElementById(`score-${playerId}`);
             const score = parseInt(input.value);
             
-            // Check if input is empty or invalid
             if (isNaN(score) || input.value.trim() === '') {
                 return;
             }
@@ -651,22 +674,24 @@
                 }
                 
                 input.value = '';
-                await saveGameState(); // Save after each score
+                await saveGameState();
                 renderGamePlayers();
             }
         }
 
         // Undo last score
         async function undoScore(playerId) {
-            if (isSpectator) return; // Spectators can't undo
+            if (isSpectator) return;
             
             const player = players.find(p => p.id === playerId);
             if (player.scores.length > 0) {
-                player.scores.pop();
-                player.total = player.scores.reduce((sum, s) => sum + s, 0);
+                const removedScore = player.scores.pop();
+                if (removedScore > 0) {
+                    player.total -= removedScore;
+                }
                 winner = null;
                 document.getElementById('winnerBanner').classList.add('hidden');
-                await saveGameState(); // Save after undo
+                await saveGameState();
                 renderGamePlayers();
             }
         }
@@ -680,7 +705,7 @@
         // Render game players
         function renderGamePlayers() {
             const list = document.getElementById('gamePlayerList');
-            const maxScore = Math.max(...players.map(p => p.total));
+            const maxScore = Math.max(...players.map(p => p.total), 0);
             
             list.innerHTML = players.map((player, index) => {
                 const isLeader = player.total === maxScore && player.total > 0;
@@ -704,7 +729,7 @@
                                 <input 
                                     type="number" 
                                     id="score-${player.id}" 
-                                    placeholder="Enter score"
+                                    placeholder="Enter score (0 for Farkle)"
                                     onkeypress="if(event.key==='Enter') addScore(${player.id})"
                                 >
                                 <button class="btn btn-success" onclick="addScore(${player.id})">Add</button>
@@ -734,28 +759,23 @@
         // Reset game
         async function resetGame() {
             if (confirm('Start a new game? This will reset all scores.')) {
-                // Clean up old game
-                stopSpectatorMode();
-                if (isHost && gameCode) {
+                stopListening();
+                
+                if (isHost && gameCode && window.firebaseDB) {
                     try {
-                        if (window.storage) {
-                            await window.storage.delete(`farkle-game-${gameCode}`, true);
-                        }
+                        const gameRef = window.firebaseRef(window.firebaseDB, `games/${gameCode}`);
+                        await window.firebaseRemove(gameRef);
                     } catch (err) {
                         console.error('Failed to delete game:', err);
-                        // Continue anyway
                     }
                 }
                 
-                // Reset state
                 players = [];
-                currentRound = 1;
                 winner = null;
                 gameCode = null;
                 isHost = false;
                 isSpectator = false;
                 
-                // Return to setup
                 document.getElementById('gameScreen').classList.add('hidden');
                 document.getElementById('setupScreen').classList.remove('hidden');
                 document.getElementById('gameCodeBanner').classList.add('hidden');
