@@ -273,6 +273,11 @@
             font-weight: 600;
         }
 
+        .chip-farkle {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
         .winner-banner {
             background: #fef3c7;
             border: 2px solid #fbbf24;
@@ -610,10 +615,32 @@
             if (isSpectator) return; // Spectators can't add scores
             
             const input = document.getElementById(`score-${playerId}`);
-            const score = parseInt(input.value) || 0;
+            const score = parseInt(input.value);
+            
+            // Check if input is empty or invalid
+            if (isNaN(score) || input.value.trim() === '') {
+                return;
+            }
+            
+            const player = players.find(p => p.id === playerId);
+            
+            // Allow zero (Farkle) at any time
+            if (score === 0) {
+                player.scores.push(0);
+                input.value = '';
+                await saveGameState();
+                renderGamePlayers();
+                return;
+            }
+            
+            // Check minimum score of 500 for first NON-ZERO score
+            const hasNonZeroScore = player.scores.some(s => s > 0);
+            if (!hasNonZeroScore && score < 500) {
+                alert('First score must be at least 500 points to get on the board! (You can enter 0 for a Farkle)');
+                return;
+            }
             
             if (score > 0) {
-                const player = players.find(p => p.id === playerId);
                 player.scores.push(score);
                 player.total += score;
                 
@@ -695,7 +722,7 @@
                             <div class="score-history">
                                 <div class="history-label">Score History:</div>
                                 <div class="history-chips">
-                                    ${player.scores.map(s => `<span class="chip">${s.toLocaleString()}</span>`).join('')}
+                                    ${player.scores.map((s, idx) => `<span class="chip ${s === 0 ? 'chip-farkle' : ''}">${s === 0 ? 'R' + (idx + 1) + ': Farkle' : 'R' + (idx + 1) + ': ' + s.toLocaleString()}</span>`).join('')}
                                 </div>
                             </div>
                         ` : ''}
