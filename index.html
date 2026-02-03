@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Alan's Farkle Score">
+    <meta name="theme-color" content="#667eea">
+    <title>Alan's Farkle Score</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237c3aed' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white'>🎲</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .round-info {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+            min-width: 60px;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+            padding: 14px;
+            border-radius: 12px;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .btn-remove {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-card.leader {
+            box-shadow: 0 0 0 3px #fbbf24;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .player-position {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+        }
+
+        .position-normal {
+            background: #667eea;
+        }
+
+        .position-leader {
+            background: #fbbf24;
+        }
+
+        .player-details h3 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .player-score {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .score-history {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 12px;
+        }
+
+        .history-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .history-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            background: #ede9fe;
+            color: #6b21a8;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .winner-banner {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .winner-banner h2 {
+            font-size: 24px;
+            color: #92400e;
+            margin-top: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .trophy {
+            font-size: 32px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div id="setupScreen">
+            <div class="card">
+                <div class="header">
+                    <h1>
+                        <span class="trophy">🎲</span>
+                        Alan's Farkle Score
+                    </h1>
+                </div>
+
+                <div class="input-group">
+                    <label>Add Players (minimum 2)</label>
+                    <div class="input-row">
+                        <input type="text" id="playerNameInput" placeholder="Player name">
+                        <button class="btn btn-add" onclick="addPlayer()">Add</button>
+                    </div>
+                </div>
+
+                <div id="playerList" class="player-list">
+                    <div class="empty-state">No players added yet</div>
+                </div>
+
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()" disabled>
+                    Start Game
+                </button>
+
+                <div style="text-align: center; margin: 20px 0; color: #6b7280; font-weight: 600;">
+                    OR
+                </div>
+
+                <div class="input-group">
+                    <label>Join Existing Game as Spectator</label>
+                    <div class="input-row">
+                        <input type="text" id="joinCodeInput" placeholder="Enter 6-digit code" maxlength="6" style="text-transform: uppercase;">
+                        <button class="btn btn-secondary" onclick="joinGame()">Join</button>
+                    </div>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 8px;">
+                        Enter the game code from the host to watch live scoring
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div class="card">
+                <div class="header">
+                    <h1>
+                        <span class="trophy">🏆</span>
+                        Alan's Farkle Score
+                    </h1>
+                    <div class="round-info">
+                        Round <span id="roundNumber">1</span> • Target: 10,000 points
+                    </div>
+                </div>
+
+                <button class="btn btn-danger" onclick="resetGame()">
+                    🔄 New Game
+                </button>
+            </div>
+
+            <div id="gameCodeBanner" class="card hidden" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-align: center;">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">SHARE THIS CODE WITH FRIENDS</div>
+                <div id="gameCodeDisplay" style="font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: monospace; margin-bottom: 12px;"></div>
+                <button onclick="copyGameCode()" class="btn" style="background: rgba(255,255,255,0.2); color: white; display: inline-flex; padding: 10px 20px;">
+                    📋 Copy Code
+                </button>
+                <div style="font-size: 12px; margin-top: 12px; opacity: 0.9;">They can watch live scoring by entering this code</div>
+            </div>
+
+            <div id="spectatorBanner" class="card hidden" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; text-align: center;">
+                <div style="font-size: 16px; font-weight: 600;">👀 SPECTATOR MODE</div>
+                <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">Watching live • Updates every 2 seconds</div>
+            </div>
+
+            <div id="winnerBanner" class="winner-banner hidden">
+                <div class="trophy">🎉</div>
+                <h2 id="winnerText"></h2>
+            </div>
+
+            <div id="gamePlayerList"></div>
+        </div>
+    </div>
+
+    <script>
+        let players = [];
+        let currentRound = 1;
+        let winner = null;
+        const WINNING_SCORE = 10000;
+        let gameCode = null;
+        let isHost = false;
+        let isSpectator = false;
+        let spectatorInterval = null;
+
+        // Generate a random 6-character game code
+        function generateGameCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Save game state to storage
+        async function saveGameState() {
+            if (!isHost || !gameCode) return;
+            
+            const gameState = {
+                players: players,
+                currentRound: currentRound,
+                winner: winner,
+                lastUpdated: Date.now()
+            };
+            
+            try {
+                if (window.storage) {
+                    await window.storage.set(`farkle-game-${gameCode}`, JSON.stringify(gameState), true);
+                }
+            } catch (err) {
+                console.error('Failed to save game state:', err);
+                // Continue without storage - local-only mode
+            }
+        }
+
+        // Load game state from storage
+        async function loadGameState(code) {
+            try {
+                if (window.storage) {
+                    const result = await window.storage.get(`farkle-game-${code}`, true);
+                    if (result && result.value) {
+                        const gameState = JSON.parse(result.value);
+                        players = gameState.players;
+                        currentRound = gameState.currentRound;
+                        winner = gameState.winner;
+                        return true;
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to load game state:', err);
+            }
+            return false;
+        }
+
+        // Start spectator mode - poll for updates
+        function startSpectatorMode() {
+            spectatorInterval = setInterval(async () => {
+                const success = await loadGameState(gameCode);
+                if (success) {
+                    renderGamePlayers();
+                    if (winner) {
+                        showWinner();
+                    }
+                }
+            }, 2000); // Poll every 2 seconds
+        }
+
+        // Stop spectator mode
+        function stopSpectatorMode() {
+            if (spectatorInterval) {
+                clearInterval(spectatorInterval);
+                spectatorInterval = null;
+            }
+        }
+
+        // Add player
+        function addPlayer() {
+            const input = document.getElementById('playerNameInput');
+            const name = input.value.trim();
+            
+            if (name) {
+                players.push({
+                    id: Date.now(),
+                    name: name,
+                    scores: [],
+                    total: 0
+                });
+                input.value = '';
+                renderPlayerList();
+                updateStartButton();
+            }
+        }
+
+        // Remove player
+        function removePlayer(id) {
+            players = players.filter(p => p.id !== id);
+            renderPlayerList();
+            updateStartButton();
+        }
+
+        // Render player list in setup
+        function renderPlayerList() {
+            const list = document.getElementById('playerList');
+            
+            if (players.length === 0) {
+                list.innerHTML = '<div class="empty-state">No players added yet</div>';
+            } else {
+                list.innerHTML = players.map(player => `
+                    <div class="player-item">
+                        <span class="player-name">${player.name}</span>
+                        <button class="btn-remove" onclick="removePlayer(${player.id})">Remove</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update start button
+        function updateStartButton() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = players.length < 2;
+        }
+
+        // Start game
+        async function startGame() {
+            if (players.length >= 2) {
+                isHost = true;
+                gameCode = generateGameCode();
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                
+                // Check if storage is available
+                if (!window.storage) {
+                    console.warn('Storage not available - spectator mode will not work');
+                    // Still show the game code but add a note
+                    showGameCode();
+                    const banner = document.getElementById('gameCodeBanner');
+                    banner.innerHTML += '<div style="font-size: 11px; margin-top: 8px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">⚠️ Spectator mode requires hosting online</div>';
+                } else {
+                    await saveGameState();
+                    showGameCode();
+                }
+                
+                renderGamePlayers();
+            }
+        }
+
+        // Show game code to host
+        function showGameCode() {
+            const banner = document.getElementById('gameCodeBanner');
+            const codeDisplay = document.getElementById('gameCodeDisplay');
+            codeDisplay.textContent = gameCode;
+            banner.classList.remove('hidden');
+        }
+
+        // Copy game code to clipboard
+        async function copyGameCode() {
+            try {
+                await navigator.clipboard.writeText(gameCode);
+                alert('Game code copied! Share it with your friends.');
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = gameCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Game code copied! Share it with your friends.');
+            }
+        }
+
+        // Join game as spectator
+        async function joinGame() {
+            const input = document.getElementById('joinCodeInput');
+            const code = input.value.trim().toUpperCase();
+            
+            if (code.length !== 6) {
+                alert('Please enter a valid 6-character game code');
+                return;
+            }
+            
+            if (!window.storage) {
+                alert('Spectator mode is only available when the app is hosted online. Please use the app locally for single-device scoring.');
+                return;
+            }
+            
+            const success = await loadGameState(code);
+            if (success) {
+                gameCode = code;
+                isSpectator = true;
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                renderGamePlayers();
+                startSpectatorMode();
+                document.getElementById('spectatorBanner').classList.remove('hidden');
+            } else {
+                alert('Game not found. Please check the code and try again.');
+            }
+        }
+
+        // Add score
+        async function addScore(playerId) {
+            if (isSpectator) return; // Spectators can't add scores
+            
+            const input = document.getElementById(`score-${playerId}`);
+            const score = parseInt(input.value) || 0;
+            
+            if (score > 0) {
+                const player = players.find(p => p.id === playerId);
+                player.scores.push(score);
+                player.total += score;
+                
+                // Check for winner
+                if (player.total >= WINNING_SCORE && !winner) {
+                    winner = player.name;
+                    showWinner();
+                }
+                
+                input.value = '';
+                await saveGameState(); // Save after each score
+                renderGamePlayers();
+            }
+        }
+
+        // Undo last score
+        async function undoScore(playerId) {
+            if (isSpectator) return; // Spectators can't undo
+            
+            const player = players.find(p => p.id === playerId);
+            if (player.scores.length > 0) {
+                player.scores.pop();
+                player.total = player.scores.reduce((sum, s) => sum + s, 0);
+                winner = null;
+                document.getElementById('winnerBanner').classList.add('hidden');
+                await saveGameState(); // Save after undo
+                renderGamePlayers();
+            }
+        }
+
+        // Show winner
+        function showWinner() {
+            document.getElementById('winnerBanner').classList.remove('hidden');
+            document.getElementById('winnerText').textContent = `${winner} wins!`;
+        }
+
+        // Render game players
+        function renderGamePlayers() {
+            const list = document.getElementById('gamePlayerList');
+            const maxScore = Math.max(...players.map(p => p.total));
+            
+            list.innerHTML = players.map((player, index) => {
+                const isLeader = player.total === maxScore && player.total > 0;
+                return `
+                    <div class="player-card ${isLeader ? 'leader' : ''}">
+                        <div class="player-header">
+                            <div class="player-info">
+                                <div class="player-position ${isLeader ? 'position-leader' : 'position-normal'}">
+                                    ${index + 1}
+                                </div>
+                                <div class="player-details">
+                                    <h3>${player.name}</h3>
+                                    <div class="player-score">${player.total.toLocaleString()}</div>
+                                </div>
+                            </div>
+                            ${isLeader ? '<span class="trophy">🏆</span>' : ''}
+                        </div>
+                        
+                        ${!isSpectator ? `
+                            <div class="score-controls">
+                                <input 
+                                    type="number" 
+                                    id="score-${player.id}" 
+                                    placeholder="Enter score"
+                                    onkeypress="if(event.key==='Enter') addScore(${player.id})"
+                                >
+                                <button class="btn btn-success" onclick="addScore(${player.id})">Add</button>
+                                <button 
+                                    class="btn btn-warning" 
+                                    onclick="undoScore(${player.id})"
+                                    ${player.scores.length === 0 ? 'disabled' : ''}
+                                >
+                                    Undo
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${player.scores.length > 0 ? `
+                            <div class="score-history">
+                                <div class="history-label">Score History:</div>
+                                <div class="history-chips">
+                                    ${player.scores.map(s => `<span class="chip">${s.toLocaleString()}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Reset game
+        async function resetGame() {
+            if (confirm('Start a new game? This will reset all scores.')) {
+                // Clean up old game
+                stopSpectatorMode();
+                if (isHost && gameCode) {
+                    try {
+                        if (window.storage) {
+                            await window.storage.delete(`farkle-game-${gameCode}`, true);
+                        }
+                    } catch (err) {
+                        console.error('Failed to delete game:', err);
+                        // Continue anyway
+                    }
+                }
+                
+                // Reset state
+                players = [];
+                currentRound = 1;
+                winner = null;
+                gameCode = null;
+                isHost = false;
+                isSpectator = false;
+                
+                // Return to setup
+                document.getElementById('gameScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.remove('hidden');
+                document.getElementById('gameCodeBanner').classList.add('hidden');
+                document.getElementById('spectatorBanner').classList.add('hidden');
+                document.getElementById('winnerBanner').classList.add('hidden');
+                renderPlayerList();
+                updateStartButton();
+            }
+        }
+
+        // Handle Enter key on player name input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('playerNameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addPlayer();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
