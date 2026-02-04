@@ -1,7 +1,7 @@
 {
-  "name": "Alan's Farkle Score",
-  "short_name": "Alan's Farkle",
-  "description": "Keep score during Farkle games with friends",
+  "name": "AA Farkle Scorer",
+  "short_name": "AA Farkle",
+  "description": "Mobile-friendly Farkle score keeper with automatic turn tracking and tournament rules",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#667eea",
@@ -9,14 +9,22 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%237c3aed' width='192' height='192' rx='40'/><text y='140' x='96' text-anchor='middle' font-size='120' fill='white'>🎲</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192' rx='40'/><text y='140' x='96' text-anchor='middle' font-size='120' fill='white'>🎲</text></svg>",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%237c3aed' width='512' height='512' rx='100'/><text y='380' x='256' text-anchor='middle' font-size='320' fill='white'>🎲</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23667eea' width='512' height='512' rx='100'/><text y='380' x='256' text-anchor='middle' font-size='320' fill='white'>🎲</text></svg>",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23667eea' width='512' height='512' rx='100'/><circle cx='256' cy='256' r='40' fill='white'/><circle cx='160' cy='160' r='40' fill='white'/><circle cx='352' cy='160' r='40' fill='white'/><circle cx='160' cy='352' r='40' fill='white'/><circle cx='352' cy='352' r='40' fill='white'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
