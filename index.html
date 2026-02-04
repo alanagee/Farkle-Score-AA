@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Alan's Farkle">
+    <meta name="apple-mobile-web-app-title" content="AA Farkle Scorer">
     <meta name="theme-color" content="#667eea">
-    <title>Alan's Farkle Score</title>
+    <title>AA Farkle Scorer</title>
     
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%237c3aed' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white'>🎲</text></svg>">
     
@@ -140,11 +140,6 @@
             color: white;
         }
 
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
         .btn:disabled {
             background: #d1d5db;
             color: #9ca3af;
@@ -245,6 +240,38 @@
             margin-bottom: 16px;
         }
 
+        .running-total {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .running-total-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .running-total-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .running-total-value.farkle {
+            color: #dc2626;
+        }
+
+        .running-total-value.zero {
+            color: #9ca3af;
+        }
+
         .score-history {
             border-top: 1px solid #e5e7eb;
             padding-top: 12px;
@@ -292,6 +319,35 @@
             margin-top: 8px;
         }
 
+        .final-round-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .final-round-banner h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .player-finished {
+            opacity: 0.6;
+        }
+
+        .player-finished-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -305,24 +361,6 @@
         .trophy {
             font-size: 32px;
         }
-
-        .game-code-banner {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            text-align: center;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .spectator-banner {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            text-align: center;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
     </style>
 </head>
 <body>
@@ -333,7 +371,7 @@
                 <div class="header">
                     <h1>
                         <span class="trophy">🎲</span>
-                        Alan's Farkle Score
+                        AA Farkle Scorer
                     </h1>
                 </div>
 
@@ -352,21 +390,6 @@
                 <button class="btn btn-primary" id="startBtn" onclick="startGame()" disabled>
                     Start Game
                 </button>
-
-                <div style="text-align: center; margin: 20px 0; color: white; font-weight: 600;">
-                    OR
-                </div>
-
-                <div class="input-group">
-                    <label style="color: white;">Join Existing Game as Spectator</label>
-                    <div class="input-row">
-                        <input type="text" id="joinCodeInput" placeholder="Enter 6-digit code" maxlength="6" style="text-transform: uppercase;">
-                        <button class="btn btn-secondary" onclick="joinGame()">Join</button>
-                    </div>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 8px;">
-                        Enter the game code from the host to watch live scoring
-                    </p>
-                </div>
             </div>
         </div>
 
@@ -376,7 +399,7 @@
                 <div class="header">
                     <h1>
                         <span class="trophy">🏆</span>
-                        Alan's Farkle Score
+                        AA Farkle Scorer
                     </h1>
                     <div class="round-info">
                         Target: 10,000 points
@@ -388,135 +411,27 @@
                 </button>
             </div>
 
-            <div id="gameCodeBanner" class="game-code-banner hidden">
-                <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">SHARE THIS CODE WITH FRIENDS</div>
-                <div id="gameCodeDisplay" style="font-size: 32px; font-weight: bold; letter-spacing: 4px; font-family: monospace; margin-bottom: 12px;"></div>
-                <button onclick="copyGameCode()" class="btn" style="background: rgba(255,255,255,0.2); color: white; display: inline-flex; padding: 10px 20px;">
-                    📋 Copy Code
-                </button>
-                <div style="font-size: 12px; margin-top: 12px; opacity: 0.9;">They can watch live scoring by entering this code</div>
-            </div>
-
-            <div id="spectatorBanner" class="spectator-banner hidden">
-                <div style="font-size: 16px; font-weight: 600;">👀 SPECTATOR MODE</div>
-                <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">Watching live • Updates in real-time</div>
-            </div>
-
             <div id="winnerBanner" class="winner-banner hidden">
                 <div class="trophy">🎉</div>
                 <h2 id="winnerText"></h2>
+            </div>
+
+            <div id="finalRoundBanner" class="final-round-banner hidden">
+                <div class="trophy">⚠️</div>
+                <h2 id="finalRoundText"></h2>
             </div>
 
             <div id="gamePlayerList"></div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
- const firebaseConfig = {
-  apiKey: "AIzaSyB1234567890abcdefghijklmnop",
-  authDomain: "farkle-scorekeeper-12345.firebaseapp.com",
-  databaseURL: "https://farkle-scorekeeper-12345-default-rtdb.firebaseio.com",
-  projectId: "farkle-scorekeeper-12345",
-  storageBucket: "farkle-scorekeeper-12345.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcd1234567890"
-};
-        // Get this from Firebase Console → Project Settings → Your apps → Web app
-        const firebaseConfig = {
-            apiKey: "YOUR-API-KEY-HERE",
-            authDomain: "YOUR-PROJECT.firebaseapp.com",
-            databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com",
-            projectId: "YOUR-PROJECT-ID",
-            storageBucket: "YOUR-PROJECT.appspot.com",
-            messagingSenderId: "YOUR-SENDER-ID",
-            appId: "YOUR-APP-ID"
-        };
-
-        // Initialize Firebase
-        let app, database;
-        try {
-            app = initializeApp(firebaseConfig);
-            database = getDatabase(app);
-            console.log('Firebase initialized successfully');
-        } catch (error) {
-            console.error('Firebase initialization error:', error);
-            alert('Please add your Firebase configuration to enable spectator mode.');
-        }
-
-        // Make database available globally
-        window.firebaseDB = database;
-        window.firebaseRef = ref;
-        window.firebaseSet = set;
-        window.firebaseOnValue = onValue;
-        window.firebaseRemove = remove;
-    </script>
-
     <script>
         let players = [];
         let winner = null;
-        let gameCode = null;
-        let isHost = false;
-        let isSpectator = false;
-        let gameListener = null;
+        let firstToFinish = null;
+        let finalRound = false;
+        let playersFinished = new Set();
         const WINNING_SCORE = 10000;
-
-        // Generate random game code
-        function generateGameCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        // Save game state to Firebase
-        async function saveGameState() {
-            if (!isHost || !gameCode || !window.firebaseDB) return;
-            
-            const gameState = {
-                players: players,
-                winner: winner,
-                lastUpdated: Date.now()
-            };
-            
-            try {
-                const gameRef = window.firebaseRef(window.firebaseDB, `games/${gameCode}`);
-                await window.firebaseSet(gameRef, gameState);
-            } catch (err) {
-                console.error('Failed to save game state:', err);
-            }
-        }
-
-        // Listen to game state changes (for spectators)
-        function startListening(code) {
-            if (!window.firebaseDB) return;
-            
-            const gameRef = window.firebaseRef(window.firebaseDB, `games/${code}`);
-            gameListener = window.firebaseOnValue(gameRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    players = data.players || [];
-                    winner = data.winner || null;
-                    renderGamePlayers();
-                    if (winner) {
-                        showWinner();
-                    }
-                }
-            });
-        }
-
-        // Stop listening
-        function stopListening() {
-            if (gameListener) {
-                gameListener();
-                gameListener = null;
-            }
-        }
 
         // Add player
         function addPlayer() {
@@ -566,123 +481,193 @@
         }
 
         // Start game
-        async function startGame() {
+        function startGame() {
             if (players.length >= 2) {
-                isHost = true;
-                gameCode = generateGameCode();
                 document.getElementById('setupScreen').classList.add('hidden');
                 document.getElementById('gameScreen').classList.remove('hidden');
-                await saveGameState();
                 renderGamePlayers();
-                showGameCode();
+                
+                // Focus on first player's input
+                setTimeout(() => {
+                    const firstInput = document.getElementById(`score-${players[0].id}`);
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 200);
             }
         }
 
-        // Show game code
-        function showGameCode() {
-            const banner = document.getElementById('gameCodeBanner');
-            const codeDisplay = document.getElementById('gameCodeDisplay');
-            codeDisplay.textContent = gameCode;
-            banner.classList.remove('hidden');
-        }
-
-        // Copy game code
-        async function copyGameCode() {
-            try {
-                await navigator.clipboard.writeText(gameCode);
-                alert('Game code copied! Share it with your friends.');
-            } catch (err) {
-                const textArea = document.createElement('textarea');
-                textArea.value = gameCode;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('Game code copied! Share it with your friends.');
-            }
-        }
-
-        // Join game as spectator
-        async function joinGame() {
-            const input = document.getElementById('joinCodeInput');
-            const code = input.value.trim().toUpperCase();
-            
-            if (code.length !== 6) {
-                alert('Please enter a valid 6-character game code');
-                return;
-            }
-            
-            if (!window.firebaseDB) {
-                alert('Firebase not configured. Please check console for setup instructions.');
-                return;
-            }
-            
-            gameCode = code;
-            isSpectator = true;
-            document.getElementById('setupScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('spectatorBanner').classList.remove('hidden');
-            startListening(code);
-        }
-
-        // Add score
-        async function addScore(playerId) {
-            if (isSpectator) return;
-            
+        // Update running total display
+        function updateRunningTotal(playerId) {
             const input = document.getElementById(`score-${playerId}`);
-            const score = parseInt(input.value);
+            const display = document.getElementById(`total-${playerId}`);
+            const inputValue = input.value.trim();
             
-            if (isNaN(score) || input.value.trim() === '') {
+            if (inputValue === '') {
+                display.innerHTML = '<div class="running-total-label">Turn Total</div><div class="running-total-value zero">---</div>';
+                return;
+            }
+            
+            // Split by spaces or commas and parse all numbers
+            const scores = inputValue.split(/[\s,]+/).map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+            
+            if (scores.length === 0) {
+                display.innerHTML = '<div class="running-total-label">Turn Total</div><div class="running-total-value zero">---</div>';
+                return;
+            }
+            
+            // Check if ANY entry is a 0 - this means Farkle!
+            if (scores.includes(0)) {
+                display.innerHTML = '<div class="running-total-label">Turn Total</div><div class="running-total-value farkle">FARKLE!</div>';
+                return;
+            }
+            
+            // Calculate total (all positive scores)
+            const total = scores.reduce((sum, score) => sum + score, 0);
+            
+            if (total === 0) {
+                display.innerHTML = '<div class="running-total-label">Turn Total</div><div class="running-total-value zero">0</div>';
+            } else {
+                display.innerHTML = `<div class="running-total-label">Turn Total</div><div class="running-total-value">${total.toLocaleString()}</div>`;
+            }
+        }
+
+        // Focus on next player's input
+        function focusNextPlayer(currentPlayerId) {
+            const currentIndex = players.findIndex(p => p.id === currentPlayerId);
+            
+            // Find next player who hasn't finished (if in final round)
+            for (let i = 1; i <= players.length; i++) {
+                const nextIndex = (currentIndex + i) % players.length;
+                const nextPlayer = players[nextIndex];
+                
+                // Skip players who have finished in final round
+                if (!finalRound || !playersFinished.has(nextPlayer.id)) {
+                    const nextInput = document.getElementById(`score-${nextPlayer.id}`);
+                    if (nextInput) {
+                        setTimeout(() => nextInput.focus(), 100);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Add score (handles multiple entries from same round)
+        function addScore(playerId) {
+            const input = document.getElementById(`score-${playerId}`);
+            const inputValue = input.value.trim();
+            
+            if (inputValue === '') {
                 return;
             }
             
             const player = players.find(p => p.id === playerId);
             
-            // Allow zero (Farkle) at any time
-            if (score === 0) {
-                player.scores.push(0);
-                input.value = '';
-                await saveGameState();
-                renderGamePlayers();
+            // Split by spaces or commas and parse all numbers
+            const scores = inputValue.split(/[\s,]+/).map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+            
+            if (scores.length === 0) {
                 return;
             }
+            
+            // If ANY entry is a 0, it's a Farkle - player loses the entire turn
+            if (scores.includes(0)) {
+                player.scores.push(0);
+                input.value = '';
+                updateRunningTotal(playerId);
+                
+                // Mark this player as finished if in final round
+                if (finalRound) {
+                    playersFinished.add(playerId);
+                    checkGameEnd();
+                }
+                
+                renderGamePlayers();
+                focusNextPlayer(playerId);
+                return;
+            }
+            
+            // Calculate total for this round (sum all scores)
+            const roundTotal = scores.reduce((sum, score) => sum + score, 0);
             
             // Check minimum score of 500 for first NON-ZERO score
             const hasNonZeroScore = player.scores.some(s => s > 0);
-            if (!hasNonZeroScore && score < 500) {
-                alert('First score must be at least 500 points to get on the board! (You can enter 0 for a Farkle)');
+            if (!hasNonZeroScore && roundTotal < 500) {
+                alert(`First score must be at least 500 points! Your turn total is ${roundTotal}. (Include a 0 for a Farkle)`);
                 return;
             }
             
-            if (score > 0) {
-                player.scores.push(score);
-                player.total += score;
+            if (roundTotal > 0) {
+                player.scores.push(roundTotal);
+                player.total += roundTotal;
                 
-                // Check for winner
-                if (player.total >= WINNING_SCORE && !winner) {
-                    winner = player.name;
-                    showWinner();
+                // Check if this player reached 10,000 first
+                if (!finalRound && player.total >= WINNING_SCORE) {
+                    firstToFinish = player;
+                    finalRound = true;
+                    playersFinished.add(playerId);
+                    showFinalRound();
+                } else if (finalRound) {
+                    // Mark this player as finished in final round
+                    playersFinished.add(playerId);
+                    checkGameEnd();
                 }
-                
-                input.value = '';
-                await saveGameState();
-                renderGamePlayers();
+            }
+            
+            input.value = '';
+            updateRunningTotal(playerId);
+            renderGamePlayers();
+            focusNextPlayer(playerId);
+        }
+        
+        // Show final round notification
+        function showFinalRound() {
+            const banner = document.getElementById('finalRoundBanner');
+            const text = document.getElementById('finalRoundText');
+            text.textContent = `${firstToFinish.name} has reached ${firstToFinish.total.toLocaleString()} points! All other players get one more turn.`;
+            banner.classList.remove('hidden');
+        }
+        
+        // Check if game should end
+        function checkGameEnd() {
+            // Check if all other players have had their final turn
+            const allPlayersFinished = players.every(p => playersFinished.has(p.id));
+            
+            if (allPlayersFinished && finalRound) {
+                // Find the winner (highest score)
+                const maxScore = Math.max(...players.map(p => p.total));
+                const winningPlayer = players.find(p => p.total === maxScore);
+                winner = winningPlayer.name;
+                showWinner();
             }
         }
 
         // Undo last score
-        async function undoScore(playerId) {
-            if (isSpectator) return;
-            
+        function undoScore(playerId) {
             const player = players.find(p => p.id === playerId);
             if (player.scores.length > 0) {
                 const removedScore = player.scores.pop();
                 if (removedScore > 0) {
                     player.total -= removedScore;
                 }
-                winner = null;
-                document.getElementById('winnerBanner').classList.add('hidden');
-                await saveGameState();
+                
+                // If in final round and this player had finished, unmark them
+                if (finalRound && playersFinished.has(playerId)) {
+                    playersFinished.delete(playerId);
+                    // Hide winner banner if it was showing
+                    document.getElementById('winnerBanner').classList.add('hidden');
+                    winner = null;
+                }
+                
+                // If this was the player who triggered final round and they go below 10,000
+                if (firstToFinish && firstToFinish.id === playerId && player.total < WINNING_SCORE) {
+                    // Reset final round
+                    finalRound = false;
+                    firstToFinish = null;
+                    playersFinished.clear();
+                    document.getElementById('finalRoundBanner').classList.add('hidden');
+                }
+                
                 renderGamePlayers();
             }
         }
@@ -700,27 +685,35 @@
             
             list.innerHTML = players.map((player, index) => {
                 const isLeader = player.total === maxScore && player.total > 0;
+                const hasFinished = finalRound && playersFinished.has(player.id);
+                
                 return `
-                    <div class="player-card ${isLeader ? 'leader' : ''}">
+                    <div class="player-card ${isLeader ? 'leader' : ''} ${hasFinished ? 'player-finished' : ''}">
                         <div class="player-header">
                             <div class="player-info">
                                 <div class="player-position ${isLeader ? 'position-leader' : 'position-normal'}">
                                     ${index + 1}
                                 </div>
                                 <div class="player-details">
-                                    <h3>${player.name}</h3>
+                                    <h3>${player.name} ${hasFinished ? '<span class="player-finished-badge">✓ Done</span>' : ''}</h3>
                                     <div class="player-score">${player.total.toLocaleString()}</div>
                                 </div>
                             </div>
                             ${isLeader ? '<span class="trophy">🏆</span>' : ''}
                         </div>
                         
-                        ${!isSpectator ? `
+                        ${!hasFinished ? `
+                            <div class="running-total" id="total-${player.id}">
+                                <div class="running-total-label">Turn Total</div>
+                                <div class="running-total-value zero">---</div>
+                            </div>
+                            
                             <div class="score-controls">
                                 <input 
-                                    type="number" 
+                                    type="text" 
                                     id="score-${player.id}" 
-                                    placeholder="Enter score (0 for Farkle)"
+                                    placeholder="50 100 150 (add 0 if you Farkle)"
+                                    oninput="updateRunningTotal(${player.id})"
                                     onkeypress="if(event.key==='Enter') addScore(${player.id})"
                                 >
                                 <button class="btn btn-success" onclick="addScore(${player.id})">Add</button>
@@ -732,7 +725,7 @@
                                     Undo
                                 </button>
                             </div>
-                        ` : ''}
+                        ` : '<div style="text-align: center; padding: 20px; color: #10b981; font-weight: 600;">Final turn complete!</div>'}
                         
                         ${player.scores.length > 0 ? `
                             <div class="score-history">
@@ -748,30 +741,18 @@
         }
 
         // Reset game
-        async function resetGame() {
+        function resetGame() {
             if (confirm('Start a new game? This will reset all scores.')) {
-                stopListening();
-                
-                if (isHost && gameCode && window.firebaseDB) {
-                    try {
-                        const gameRef = window.firebaseRef(window.firebaseDB, `games/${gameCode}`);
-                        await window.firebaseRemove(gameRef);
-                    } catch (err) {
-                        console.error('Failed to delete game:', err);
-                    }
-                }
-                
                 players = [];
                 winner = null;
-                gameCode = null;
-                isHost = false;
-                isSpectator = false;
+                firstToFinish = null;
+                finalRound = false;
+                playersFinished = new Set();
                 
                 document.getElementById('gameScreen').classList.add('hidden');
                 document.getElementById('setupScreen').classList.remove('hidden');
-                document.getElementById('gameCodeBanner').classList.add('hidden');
-                document.getElementById('spectatorBanner').classList.add('hidden');
                 document.getElementById('winnerBanner').classList.add('hidden');
+                document.getElementById('finalRoundBanner').classList.add('hidden');
                 renderPlayerList();
                 updateStartButton();
             }
